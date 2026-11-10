@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101713">
+  <meta name="description" content="NasuaOS — a modern hobby operating system written from scratch in C++.">
+  <title>NasuaOS — Built from scratch</title>
+  <style>
+    :root {
+      --bg: #101713;
+      --panel: #17211b;
+      --panel-2: #1d2a22;
+      --line: rgba(225, 239, 226, .12);
+      --text: #edf4ed;
+      --muted: #a1b1a4;
+      --green: #a8d99b;
+      --green-2: #6fb878;
+      --orange: #e5a46f;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; color: var(--text); background:
+        radial-gradient(ellipse at 78% 5%, rgba(91, 145, 93, .16), transparent 34rem),
+        radial-gradient(ellipse at 8% 38%, rgba(229, 164, 111, .07), transparent 28rem),
+        var(--bg);
+      font-family: var(--sans); line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(1120px, calc(100% - 44px)); margin: 0 auto; }
+    header {
+      position: sticky; top: 0; z-index: 10; backdrop-filter: blur(18px);
+      background: rgba(16, 23, 19, .82); border-bottom: 1px solid var(--line);
+    }
+    nav { height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: -.04em; font-size: 1.2rem; }
+    .brand-mark { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 12px; background: var(--green); color: #17251a; }
+    .brand-mark svg { width: 27px; height: 27px; }
+    .navlinks { display: flex; gap: 28px; align-items: center; color: var(--muted); font-size: .92rem; }
+    .navlinks a:hover { color: var(--green); }
+    .nav-cta, .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      border: 1px solid rgba(168,217,155,.4); border-radius: 10px; padding: 11px 17px;
+      color: #142018; background: var(--green); font-weight: 750; transition: .2s ease;
+    }
+    .nav-cta:hover, .button:hover { transform: translateY(-2px); background: #c0e7b6; }
+    .button.secondary { color: var(--text); background: transparent; border-color: var(--line); }
+    .button.secondary:hover { border-color: var(--green); color: var(--green); background: rgba(168,217,155,.06); }
+    .hero { padding: 92px 0 82px; display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 56px; min-height: 590px; }
+    .eyebrow { color: var(--green); font: 700 .78rem var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+    h1 { font-size: clamp(3.2rem, 7vw, 5.7rem); letter-spacing: -.075em; line-height: .98; margin: 20px 0 24px; }
+    h1 span { color: var(--green); }
+    .lead { max-width: 570px; color: var(--muted); font-size: 1.12rem; margin-bottom: 30px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .micro { margin-top: 24px; color: #718276; font: .78rem var(--mono); }
+    .terminal {
+      position: relative; border: 1px solid rgba(168,217,155,.2); border-radius: 18px; overflow: hidden;
+      background: linear-gradient(145deg, rgba(31,46,36,.97), rgba(17,26,21,.98));
+      box-shadow: 0 30px 90px rgba(0,0,0,.38), 0 0 70px rgba(111,184,120,.08);
+      transform: rotate(1.3deg);
+    }
+    .terminal-top { height: 47px; display: flex; align-items: center; padding: 0 17px; border-bottom: 1px solid var(--line); gap: 7px; color: #839487; font: .72rem var(--mono); }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #d87969; }
+    .dot:nth-child(2) { background: #d9b36f; } .dot:nth-child(3) { background: #82bd7d; }
+    .terminal-title { margin-left: auto; }
+    .terminal-body { padding: 28px 27px 32px; font: .84rem/2 var(--mono); min-height: 300px; }
+    .prompt { color: var(--green); } .dim { color: #718779; } .orange { color: var(--orange); }
+    .ascii { color: var(--green); font-size: .67rem; line-height: 1.15; white-space: pre; margin: 0 0 22px; }
+    .cursor { display: inline-block; width: 8px; height: 15px; background: var(--green); vertical-align: -3px; animation: blink 1s steps(2) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .section { padding: 82px 0; border-top: 1px solid var(--line); }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 34px; }
+    h2 { font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.055em; line-height: 1.1; margin: 10px 0 0; }
+    .section-head p { color: var(--muted); max-width: 430px; margin: 0; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card { background: rgba(23,33,27,.78); border: 1px solid var(--line); border-radius: 15px; padding: 25px; }
+    .card-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; color: var(--green); background: rgba(168,217,155,.1); font-size: 1.2rem; margin-bottom: 19px; }
+    .card h3 { margin: 0 0 8px; font-size: 1.08rem; }
+    .card p { color: var(--muted); font-size: .92rem; margin: 0; }
+    .specs { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 15px; overflow: hidden; }
+    .spec { background: var(--panel); padding: 23px; }
+    .spec strong { display: block; font: 700 1.3rem var(--mono); color: var(--green); margin-bottom: 5px; }
+    .spec span { color: var(--muted); font-size: .82rem; }
+    .roadmap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .roadmap .card { display: flex; gap: 18px; }
+    .status { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 50%; background: var(--orange); margin-top: 8px; box-shadow: 0 0 14px rgba(229,164,111,.4); }
+    .status.planned { background: #74877a; box-shadow: none; }
+    .roadmap h3 { margin-bottom: 4px; }
+    .tag { display: inline-block; margin-top: 10px; color: var(--green); font: .7rem var(--mono); }
+    .community { padding: 38px; border: 1px solid rgba(168,217,155,.24); border-radius: 18px; background: linear-gradient(120deg, rgba(168,217,155,.1), rgba(23,33,27,.6)); display: flex; justify-content: space-between; align-items: center; gap: 25px; }
+    .community p { color: var(--muted); margin: 8px 0 0; }
+    footer { border-top: 1px solid var(--line); padding: 28px 0; color: #77877b; font-size: .82rem; }
+    footer .wrap { display: flex; justify-content: space-between; gap: 20px; }
+    .mobile-menu { display: none; }
+    @media (max-width: 800px) {
+      .hero { grid-template-columns: 1fr; padding-top: 68px; gap: 42px; }
+      .terminal { max-width: 600px; width: 100%; transform: none; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .specs { grid-template-columns: 1fr 1fr; }
+      .section-head { display: block; } .section-head p { margin-top: 14px; }
+    }
+    @media (max-width: 560px) {
+      .wrap { width: min(100% - 30px, 1120px); }
+      nav { height: 66px; } .navlinks { display: none; } .nav-cta { padding: 9px 11px; font-size: .82rem; }
+      .hero { padding: 58px 0; } h1 { font-size: 3.45rem; }
+      .grid, .roadmap { grid-template-columns: 1fr; }
+      .section { padding: 62px 0; }
+      .community { padding: 25px; display: block; } .community .button { margin-top: 20px; }
+      footer .wrap { display: block; } footer span { display: block; margin-top: 6px; }
+      .terminal-body { padding: 22px 17px; font-size: .73rem; }
+      .ascii { font-size: .49rem; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <nav class="wrap">
+    <a class="brand" href="#top" aria-label="NasuaOS — strona główna">
+      <span class="brand-mark">
+        <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <path d="M12 26 17 9l13 9h4l13-9 5 17c3 5 4 10 2 16-3 10-12 15-22 15S13 52 10 42c-2-6-1-11 2-16Z" fill="currentColor"/>
+          <path d="m17 28 11 4-7 9-10-3 6-10Zm30 0-11 4 7 9 10-3-6-10Z" fill="#a8d99b"/>
+          <path d="M25 38c3-3 11-3 14 0l-7 9-7-9Z" fill="#17251a"/>
+          <circle cx="23" cy="27" r="2.5" fill="#17251a"/><circle cx="41" cy="27" r="2.5" fill="#17251a"/>
+        </svg>
+      </span>
+      NasuaOS
+    </a>
+    <div class="navlinks">
+      <a href="#about">About</a><a href="#features">Features</a><a href="#roadmap">Roadmap</a>
+    </div>
+    <a class="nav-cta" href="https://github.com/szatakis/NasuaOS" target="_blank" rel="noopener">GitHub <span>↗</span></a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero wrap">
+    <div>
+      <div class="eyebrow">Independent operating system project</div>
+      <h1>Meet<br><span>NasuaOS.</span></h1>
+      <p class="lead">A modern hobby operating system written from scratch in C++. Built to explore how computers work at a low level and to create an independent computing environment.</p>
+      <div class="actions">
+        <a class="button" href="https://github.com/szatakis/NasuaOS" target="_blank" rel="noopener">View on GitHub <span>↗</span></a>
+        <a class="button secondary" href="#about">Explore the project</a>
+      </div>
+      <div class="micro">C++20&nbsp; / &nbsp;FREESTANDING&nbsp; / &nbsp;OPEN DEVELOPMENT</div>
+    </div>
+    <div class="terminal" aria-label="Podgląd terminala NasuaOS">
+      <div class="terminal-top"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="terminal-title">nasua — terminal</span></div>
+      <div class="terminal-body">
+<pre class="ascii">  /\_/\
+ ( o.o )   NASUA OS
+  &gt; ^ &lt;    kernel interface</pre>
+        <div><span class="dim">nasua@system</span>:<span class="orange">~</span>$ neofetch</div>
+        <div><span class="prompt">OS</span>        NasuaOS</div>
+        <div><span class="prompt">Kernel</span>    Nasua Kernel</div>
+        <div><span class="prompt">Arch</span>      x86_64</div>
+        <div><span class="prompt">Language</span>  C++20</div>
+        <div><span class="prompt">Shell</span>     nasua-sh</div>
+        <br>
+        <div><span class="dim">nasua@system</span>:<span class="orange">~</span>$ <span class="cursor"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <div><div class="eyebrow">01 / About</div><h2>System od podstaw.<br>Bez skrótów.</h2></div>
+        <p>NasuaOS to eksperymentalny projekt OS-dev. Celem jest stworzenie własnego kernela, sterowników, systemu plików i graficznego środowiska — krok po kroku.</p>
+      </div>
+      <div class="specs">
+        <div class="spec"><strong>C++20</strong><span>Główny język projektu</span></div>
+        <div class="spec"><strong>x86_64</strong><span>Główna platforma</span></div>
+        <div class="spec"><strong>ClawFS</strong><span>Własny system plików</span></div>
+        <div class="spec"><strong>NAPP</strong><span>Format aplikacji</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <div><div class="eyebrow">02 / Inside Nasua</div><h2>Małe kroki.<br>Własne rozwiązania.</h2></div>
+        <p>Projekt łączy klasyczne zagadnienia tworzenia systemów operacyjnych z własnymi pomysłami na architekturę i interfejs.</p>
+      </div>
+      <div class="grid">
+        <article class="card"><div class="card-icon">⌘</div><h3>Custom kernel</h3><p>Freestanding C++20 and the development of low-level system components.</p></article>
+        <article class="card"><div class="card-icon">▤</div><h3>ClawFS</h3><p>A custom filesystem designed specifically for NasuaOS.</p></article>
+        <article class="card"><div class="card-icon">▦</div><h3>Graphical environment</h3><p>Windows, a taskbar and an interface inspired by classic desktop systems.</p></article>
+        <article class="card"><div class="card-icon">⌁</div><h3>Architectures</h3><p>Focused primarily on x86_64, with other architectures explored experimentally.</p></article>
+        <article class="card"><div class="card-icon">▧</div><h3>Custom applications</h3><p>The NAPP format and the foundations of an independent application ecosystem.</p></article>
+        <article class="card"><div class="card-icon">⚙</div><h3>Drivers</h3><p>Expanding support for hardware, graphics and input/output devices.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="roadmap">
+    <div class="wrap">
+      <div class="section-head">
+        <div><div class="eyebrow">03 / Development</div><h2>Co dalej?</h2></div>
+        <p>NasuaOS jest projektem rozwijanym etapami. Poniższe punkty przedstawiają kierunki prac, a nie deklarację gotowych funkcji.</p>
+      </div>
+      <div class="roadmap">
+        <article class="card"><span class="status"></span><div><h3>Kernel and system foundations</h3><p>Improving the boot process, memory management, interrupts and core services.</p><span class="tag">CORE DEVELOPMENT</span></div></article>
+        <article class="card"><span class="status"></span><div><h3>Graphics and GUI</h3><p>Improving the framebuffer, window manager and input handling.</p><span class="tag">DESKTOP</span></div></article>
+        <article class="card"><span class="status planned"></span><div><h3>Networking</h3><p>Expanding Ethernet drivers, network configuration and networking services.</p><span class="tag">PLANNED</span></div></article>
+        <article class="card"><span class="status planned"></span><div><h3>Applications and tools</h3><p>Developing the ABI, system utilities and applications for NasuaOS.</p><span class="tag">PLANNED</span></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="community">
+        <div><div class="eyebrow">Open source development</div><h2>Follow NasuaOS development.</h2><p>Find the source code, updates and current project status on GitHub.</p></div>
+        <a class="button" href="https://github.com/szatakis/NasuaOS" target="_blank" rel="noopener">Open GitHub ↗</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><div>© 2026 NasuaOS Project</div><span>Made with C++ and curiosity.</span></div></footer>
+</body>
+</html>
